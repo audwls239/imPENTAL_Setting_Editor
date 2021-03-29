@@ -1,0 +1,1 @@
+../jdk-10/bin/javac -d classFile/ sourceCode/*.java

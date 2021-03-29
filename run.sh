@@ -1,0 +1,1 @@
+../jdk-10/bin/java -cp classFile/ SettingEditor
