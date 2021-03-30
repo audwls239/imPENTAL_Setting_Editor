@@ -10,13 +10,18 @@ public class SettingEditor extends JFrame implements ActionListener{
 
     /* 필드 */
     private final JPanel menu = new JPanel();
-    private final JPanel option_panel = new JPanel();
     private final JScrollPane options_scroll = new JScrollPane();
     private final PanelOfSetting[] setting_panel = new PanelOfSetting[50];
+    private JPanel option_panel = new JPanel();
 
-    private final JTextField file_path  = new JTextField("", 20);   // 파일 경로 표시용 텍스트
+    private final JTextField show_file_path  = new JTextField("", 20);   // 파일 경로 표시용 텍스트
     private final JButton file_open     = new JButton("OPEN");      // 파일 열기 버튼
     private final JButton file_save     = new JButton("SAVE");      // 변경 내용 저장
+
+    private String file_path;
+    private String file_name;
+
+    private File read_file_name;
     
     /* 생성자 */
     SettingEditor(){
@@ -27,14 +32,13 @@ public class SettingEditor extends JFrame implements ActionListener{
         setResizable(false);    // 창 크기 변경 불가능
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));   // 박스 레이아웃 지정
         
-        option_panel.setLayout(new BoxLayout(option_panel, BoxLayout.Y_AXIS));
         
-        file_path.setEditable(false);   // 텍스트 변경 불가능
+        show_file_path.setEditable(false);   // 텍스트 변경 불가능
         
-        file_open.addActionListener(this);  // "OPEN" 버튼 이벤트 리스너 등록
+        file_open.addActionListener(this);
         file_save.addActionListener(this);
         
-        menu.add(file_path);
+        menu.add(show_file_path);
         menu.add(file_open);
         menu.add(file_save);
 
@@ -53,17 +57,28 @@ public class SettingEditor extends JFrame implements ActionListener{
 
             if(dialog.getFile() == null) return;     // 다이얼로그에서 취소 선택시 탈출
 
-            this.file_path.setText(dialog.getDirectory() + dialog.getFile());           // 파일 선택시 파일 경로 표시
-            File read_file_name = new File(dialog.getDirectory(), dialog.getFile());      // 파일 클래스 생성
+            this.file_path = dialog.getDirectory();
+            this.file_name = dialog.getFile();
 
-            try(FileReader reading_file = new FileReader(read_file_name)){   // 입력 스트림 생성
-                int num = 0;
+            this.show_file_path.setText(this.file_path + this.file_name);   // 파일 선택시 파일 경로 표시
+            this.read_file_name = new File(this.file_path, this.file_name); // 파일 인스턴스 생성
+
+            try(FileReader now_reading_file = new FileReader(this.read_file_name)){
+                /* 입력 스트림 생성 */
+                int num = 0;    // 설정 패널 구분용 번호
+                option_panel = new JPanel();
+                option_panel.setLayout(new BoxLayout(option_panel, BoxLayout.Y_AXIS));
+
+                for(int i = 0; i < setting_panel.length; i++){
+                    setting_panel[i] = null;
+                }
+
                 while(true){
-                    int temp_char = reading_file.read();
+                    int temp_char = now_reading_file.read();
 
                     /* # 주석 라인 무시 */
                     if(temp_char == '#'){
-                        while(reading_file.read() != '\n');
+                        while(now_reading_file.read() != '\n');
                         continue;
                     }
 
@@ -71,15 +86,19 @@ public class SettingEditor extends JFrame implements ActionListener{
                     String temp_name_string = "";
                     while(temp_char != '='){
                         temp_name_string += (char)temp_char;
-                        temp_char = reading_file.read();
+                        temp_char = now_reading_file.read();
+
+                        if(temp_char == -1){
+                            break;
+                        }
                     }
 
                     /* 옵션 종류 확인용 */
                     String temp_option_string = "";
-                    temp_char = reading_file.read();
+                    temp_char = now_reading_file.read();
                     while(temp_char != '\n'){
                         temp_option_string += (char)temp_char;
-                        temp_char = reading_file.read();
+                        temp_char = now_reading_file.read();
 
                         if(temp_char == -1){
                             break;
@@ -95,7 +114,6 @@ public class SettingEditor extends JFrame implements ActionListener{
                         options_scroll.setViewportView(option_panel);
                         add(options_scroll);
                         setVisible(true);
-                        System.out.println("야햐롱");
                         break;
                     }
                 }
@@ -105,7 +123,24 @@ public class SettingEditor extends JFrame implements ActionListener{
             }
         }
         else if(e.getActionCommand() == "SAVE"){
-            System.out.println("야하롱!");
+            /* 출력 스트림 생성 */
+            try(FileWriter now_writing_file = new FileWriter(this.read_file_name)){
+                int num = 0;
+                while(true){
+                    now_writing_file.write(setting_panel[num].setting_name);
+                    now_writing_file.write("=");
+                    now_writing_file.write(setting_panel[num].option);
+                    now_writing_file.write("\n");
+                    num++;
+
+                    if(setting_panel[num] == null){
+                        break;
+                    }
+                }
+            }
+            catch(IOException a){
+                System.out.println(a);
+            }
         }
     }
 }

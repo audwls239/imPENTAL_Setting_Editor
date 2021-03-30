@@ -3,14 +3,15 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
-class PanelOfSetting extends JPanel implements ItemListener{
+class PanelOfSetting extends JPanel implements ActionListener{
     /* 필드 */
+    String setting_name;
+    String option;
+
     ImageIcon unlock_icon = new ImageIcon("./src/img_unlock.png");
     ImageIcon   lock_icon = new ImageIcon("./src/img_lock.png");
 
     JToggleButton lock_toggle = new JToggleButton(unlock_icon);
-    JLabel setting_name = new JLabel();
-    String option;
     OptionTextBox newBox;
 
     JButton box_open;
@@ -20,14 +21,22 @@ class PanelOfSetting extends JPanel implements ItemListener{
     PanelOfSetting(String get_name, String get_option, int num){
         setLayout(new BorderLayout());
 
+        /* 값 가져오기 */
+        this.setting_name = get_name;
+        this.option = get_option;
+
+        /* 배경색 */
         if(num % 2 == 0)
             setBackground(new Color(230, 230, 230));
         
-        setting_name.setText(get_name);
+        /* 컴포넌트 생성 */
+        JLabel name_label = new JLabel((String)this.setting_name);
 
+        /* 컴포넌트 추가 */
         add(lock_toggle, BorderLayout.WEST);
-        add(setting_name, BorderLayout.CENTER);
+        add(name_label, BorderLayout.CENTER);
 
+        /* 잠금 버튼 설정 */
         lock_toggle.setSelectedIcon(lock_icon);
         lock_toggle.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
@@ -48,18 +57,13 @@ class PanelOfSetting extends JPanel implements ItemListener{
             }
         });
 
-        System.out.println("야하롱1");
         /* 옵션이 true / false 선택 일 경우 */
         if(get_option.equals("true") || get_option.equals("false")){
-            this.option = get_option;
             choose_option = new JComboBox();
 
+            /* 선택지 true / false 추가 */
             choose_option.addItem(true);
             choose_option.addItem(false);
-
-            choose_option.addItemListener(this);
-            System.out.println("야하롱2");
-            System.out.println(this.option);
 
             /* 현재 설정 가져오기 */
             if(get_option.equals("true")){
@@ -69,12 +73,13 @@ class PanelOfSetting extends JPanel implements ItemListener{
                 choose_option.setSelectedIndex(1);
             }
 
+            choose_option.addActionListener(this);
+
             add(choose_option, BorderLayout.EAST);
         }
         /* 일반 텍스트 일 경우 */
         else{
             box_open = new JButton("OPEN BOX");
-            this.option = get_option;
 
             box_open.addActionListener(new ActionListener(){
                 /* "OPEN BOX" 버튼 클릭시 해당 옵션 변경 창(OptionTextBox) 오픈 */
@@ -86,7 +91,9 @@ class PanelOfSetting extends JPanel implements ItemListener{
                     newBox.addWindowListener(new WindowListener(){
                         /* 설정 변경 후 OptionTextBox 창이 닫힐 시 값을 가져옴 */
                         public void windowClosed(WindowEvent arg0){
-                            option = newBox.change_value.getText();
+                            if(!newBox.change_value.getText().isEmpty()){
+                                option = newBox.change_value.getText();
+                            }
                         }
                         public void windowClosing(WindowEvent arg0){}
                         public void windowActivated(WindowEvent arg0){}
@@ -103,15 +110,17 @@ class PanelOfSetting extends JPanel implements ItemListener{
     }
 
     /* true / false 선택시 값 변경 */
-    public void itemStateChanged(ItemEvent item){
+    public void actionPerformed(ActionEvent item){
         JComboBox source = (JComboBox) item.getSource();
         int index = source.getSelectedIndex();
 
-        if(index == 0){
-            option = "true";
-        }
-        else if(index == 1){
-            option = "false";
+        switch(index){
+            case 0:
+                option = "true";
+                break;
+            case 1:
+                option = "false";
+                break;
         }
     }
 }

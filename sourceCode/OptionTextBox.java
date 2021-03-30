@@ -5,7 +5,7 @@ import java.awt.event.*;
 
 class OptionTextBox extends JFrame implements ActionListener{
     /* 필드 */
-    JLabel current_label        = new JLabel("Current");
+    JLabel current_label        = new JLabel("Current Value");
     JLabel change_label         = new JLabel("Change to");
     JTextField current_value    = new JTextField("", 20);
     JTextField change_value     = new JTextField("", 20);
