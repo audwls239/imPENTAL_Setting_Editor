@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 class OptionTextBox extends JFrame implements ActionListener{
     /* 필드 */
+    private final ImageIcon frame_icon = new ImageIcon("./src/minecraft_icon.png");
     JLabel current_label        = new JLabel("Current Value");
     JLabel change_label         = new JLabel("Change to");
     JTextField current_value    = new JTextField("", 20);
@@ -15,6 +16,7 @@ class OptionTextBox extends JFrame implements ActionListener{
     OptionTextBox(String get_option){
         super("OPTION BOX");
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        setIconImage(frame_icon.getImage());
         setSize(300, 125);
 
         current_value.setText(get_option);

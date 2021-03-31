@@ -8,8 +8,8 @@ class PanelOfSetting extends JPanel implements ActionListener{
     String setting_name;
     String option;
 
-    ImageIcon unlock_icon = new ImageIcon("./src/img_unlock.png");
-    ImageIcon   lock_icon = new ImageIcon("./src/img_lock.png");
+    private final ImageIcon unlock_icon = new ImageIcon("./src/img_unlock.png");
+    private final ImageIcon   lock_icon = new ImageIcon("./src/img_lock.png");
 
     JToggleButton lock_toggle = new JToggleButton(unlock_icon);
     OptionTextBox newBox;
@@ -29,12 +29,9 @@ class PanelOfSetting extends JPanel implements ActionListener{
         if(num % 2 == 0)
             setBackground(new Color(230, 230, 230));
         
-        /* 컴포넌트 생성 */
-        JLabel name_label = new JLabel((String)this.setting_name);
-
         /* 컴포넌트 추가 */
         add(lock_toggle, BorderLayout.WEST);
-        add(name_label, BorderLayout.CENTER);
+        add(new JLabel((String) this.setting_name), BorderLayout.CENTER);
 
         /* 잠금 버튼 설정 */
         lock_toggle.setSelectedIcon(lock_icon);
@@ -58,7 +55,7 @@ class PanelOfSetting extends JPanel implements ActionListener{
         });
 
         /* 옵션이 true / false 선택 일 경우 */
-        if(get_option.equals("true") || get_option.equals("false")){
+        if(this.option.equals("true") || this.option.equals("false")){
             choose_option = new JComboBox();
 
             /* 선택지 true / false 추가 */
@@ -91,7 +88,7 @@ class PanelOfSetting extends JPanel implements ActionListener{
                     newBox.addWindowListener(new WindowListener(){
                         /* 설정 변경 후 OptionTextBox 창이 닫힐 시 값을 가져옴 */
                         public void windowClosed(WindowEvent arg0){
-                            if(!newBox.change_value.getText().isEmpty()){
+                            if(!newBox.change_value.getText().equals("")){
                                 option = newBox.change_value.getText();
                             }
                         }

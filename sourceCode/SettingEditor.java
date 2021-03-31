@@ -12,6 +12,7 @@ public class SettingEditor extends JFrame implements ActionListener{
     private final JPanel menu = new JPanel();
     private final JScrollPane options_scroll = new JScrollPane();
     private final PanelOfSetting[] setting_panel = new PanelOfSetting[50];
+    private final ImageIcon frame_icon = new ImageIcon("./src/minecraft_icon.png");
     private JPanel option_panel = new JPanel();
 
     private final JTextField show_file_path  = new JTextField("", 20);   // 파일 경로 표시용 텍스트
@@ -26,6 +27,7 @@ public class SettingEditor extends JFrame implements ActionListener{
     /* 생성자 */
     SettingEditor(){
         super("Setting Editor");    // 타이틀
+        setIconImage(frame_icon.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     // 창 닫을시 프로그램 종료
         
         setSize(400, 600);      // 창 크기 W = 400, H = 1000
@@ -81,28 +83,24 @@ public class SettingEditor extends JFrame implements ActionListener{
                         while(now_reading_file.read() != '\n');
                         continue;
                     }
+                    if(temp_char == 10) continue;
 
                     /* 패널에 사용될 설정명 생성 */
                     String temp_name_string = "";
-                    while(temp_char != '='){
+                    while(true){
+                        if(temp_char == -1 || temp_char == 61) break;
                         temp_name_string += (char)temp_char;
-                        temp_char = now_reading_file.read();
 
-                        if(temp_char == -1){
-                            break;
-                        }
+                        temp_char = now_reading_file.read();
                     }
 
                     /* 옵션 종류 확인용 */
                     String temp_option_string = "";
-                    temp_char = now_reading_file.read();
-                    while(temp_char != '\n'){
-                        temp_option_string += (char)temp_char;
+                    while(true){
                         temp_char = now_reading_file.read();
+                        if(temp_char == -1 || temp_char == 10 || temp_char == 13) break;
 
-                        if(temp_char == -1){
-                            break;
-                        }
+                        temp_option_string += (char)temp_char;
                     }
 
                     setting_panel[num] = new PanelOfSetting(temp_name_string, temp_option_string, num);
@@ -130,12 +128,10 @@ public class SettingEditor extends JFrame implements ActionListener{
                     now_writing_file.write(setting_panel[num].setting_name);
                     now_writing_file.write("=");
                     now_writing_file.write(setting_panel[num].option);
-                    now_writing_file.write("\n");
                     num++;
+                    if(setting_panel[num] == null) break;
 
-                    if(setting_panel[num] == null){
-                        break;
-                    }
+                    now_writing_file.write("\n");
                 }
             }
             catch(IOException a){
